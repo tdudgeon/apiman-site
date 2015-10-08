@@ -8,8 +8,8 @@ RUN cd $JBOSS_HOME \
  && bsdtar -xf apiman-distro-wildfly8-$APIMAN_VERSION-overlay.zip \
  && rm apiman-distro-wildfly8-$APIMAN_VERSION-overlay.zip
 
-#COPY postgresql-9.3-1102-jdbc41.jar /opt/jboss/wildfly/standalone/deployments/
-#COPY apiman-ds.xml /opt/jboss/wildfly/standalone/deployments/
+COPY postgresql-9.3-1102-jdbc41.jar /opt/jboss/wildfly/standalone/deployments/
+COPY apiman-ds.xml /opt/jboss/wildfly/standalone/deployments/
 COPY apiman.properties /opt/jboss/wildfly/standalone/configuration/
 COPY standalone-apiman.xml /opt/jboss/wildfly/standalone/configuration/
 COPY keystore.jks /opt/jboss/wildfly/standalone/configuration/
