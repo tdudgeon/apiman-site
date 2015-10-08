@@ -1,0 +1,4 @@
+**/keystore.jks
+**/server.crt
+distro/**
+**/*.000

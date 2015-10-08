@@ -1,0 +1,23 @@
+postgres:
+    build: postgres/
+    ports:
+    - "5432:5432"
+
+keycloak:
+    build: keycloak/
+    ports:
+    - "8080:8080"
+    - "8443:8443"
+    links:
+    - postgres:postgres
+    environment:
+    - POSTGRES_DATABASE=keycloak
+    - POSTGRES_USER=keycloak
+    - POSTGRES_PASSWORD=keycloak
+
+apiman:
+    build: apiman/
+    ports:
+    - 80:8080
+    - 443:8443
+    - 9990:9990
