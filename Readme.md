@@ -49,9 +49,9 @@ Then copy those files to the needed places using the copy-keystore.sh shell scri
 
 Also, if your server name is not 192.168.59.103 you need to edit these files:
 
-- apiman/apiman-ds.xml - edit the connection url to point to your server
 - apiman/apiman.properties - edit the apiman-gateway.public-endpoint property at the bottom of this file to point to your server
 - apiman/standalone-apiman.xml - edit the kc:auth-server-url element (around line 425) to point to your server
+- apiman-realm.json - edit the redirect URLs
 
 In testing the server will likely be localhost or the IP address of the docker host (if using boot2docker or docker machine). In production it would be the name or IP address of your public server.
 
