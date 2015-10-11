@@ -71,12 +71,14 @@ NOTE: docker-compose by default uses the parent directory name as the root stem 
 
 This deploys a Docker container with the PostgreSQL database.
 
-```$ docker-compose up -d postgres
+```sh
+$ docker-compose up -d postgres
 Creating apimansite_postgres_1...
 $ docker ps
 CONTAINER ID        IMAGE                 COMMAND                CREATED             STATUS              PORTS                    NAMES
 d7a44e51beba        apimansite_postgres   "/usr/lib/postgresql   52 seconds ago      Up 51 seconds       0.0.0.0:5432->5432/tcp   apimansite_postgres_1   
-$```
+$
+```
 
 ## Import apiman realm into Keycloak
 To import the realm definition that Apiman needs into Keycloak you need to start the keycloak server with special arguments that tell it to import a real definition from a json file. We can't do that when we build the image as it is persisted in the database, so we first start the database, and then fire up a temporary Keycloak container that populates the database with the real configuration.
@@ -84,7 +86,9 @@ To import the realm definition that Apiman needs into Keycloak you need to start
 The apiman-realm.json file contains the definition of the apiman realm that is expected by Apiman.
 To achieve this start the Keycloak container with these special startup args. This starts keycloak and imports the realm definition.
 
-`docker run -it --link apimansite_postgres_1:postgres -e POSTGRES_DATABASE=keycloak -e POSTGRES_USER=keycloak -e POSTGRES_PASSWORD=keycloak --rm -v $PWD:/tmp/json apimansite_keycloak /opt/jboss/keycloak/bin/standalone.sh -b 0.0.0.0 -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=/tmp/json/apiman-realm.json -Dkeycloak.migration.strategy=OVERWRITE_EXISTING`
+```sh
+docker run -it --link apimansite_postgres_1:postgres -e POSTGRES_DATABASE=keycloak -e POSTGRES_USER=keycloak -e POSTGRES_PASSWORD=keycloak --rm -v $PWD:/tmp/json apimansite_keycloak /opt/jboss/keycloak/bin/standalone.sh -b 0.0.0.0 -Dkeycloak.migration.action=import -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=/tmp/json/apiman-realm.json -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
+```
 
 (replace apimansite_postgres_1 and apimansite_keycloak with the appropriate names if your root directory name is different, and change usernames and passwords as needed).
 
@@ -94,11 +98,13 @@ The result of this exercise is that the PostgreSQL keycloak database has had the
 ## Deploy all containers
 Now start all the containers using `docker-compose up -d`.
 
-```$ docker-compose up -d
+```sh
+$ docker-compose up -d
 Creating apimansite_apiman_1...
 Recreating apimansite_postgres_1...
 Creating apimansite_keycloak_1...
-$```
+$
+```
 
 You should now have a basic functioning system. 
 Check this by connecting to keycloak using admin/admin as credentials (you are prompted to change the password):
@@ -115,26 +121,35 @@ You should se the API Management console.
 So far so good. We have a functioning setup, so let's use it to set up a service.
 
 # Running Echo service through apiman
+
 ## Setting up echo service
 We'll use the apiman echo service sample app to test things. For this we'll run the echo app to wildfly in the apiman container.
 The is done by default in the apiman Dockerfile, but if you need to use a different version you can build as follows:
 Start an apiman container.
 Install maven into the apimman contianer (as root):
 
-`docker exec -it -u root apimansite_apiman_1 bash -c 'curl -o /etc/yum.repos.d/epel-apache-maven.repo https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo; yum install -y apache-maven'`
+```sh
+docker exec -it -u root apimansite_apiman_1 bash -c 'curl -o /etc/yum.repos.d/epel-apache-maven.repo https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo; yum install -y apache-maven'
+```
 
 Now build the echo-service war file:
 
-`docker exec -it apimansite_apiman_1 bash -c 'cd /opt/jboss/wildfly/apiman/quickstarts/echo-service; mvn clean package'`
+```sh
+docker exec -it apimansite_apiman_1 bash -c 'cd /opt/jboss/wildfly/apiman/quickstarts/echo-service; mvn clean package'
+```
 
 Now copy it from the container:
 
-`docker cp apimansite_apiman_1:/opt/jboss/wildfly/apiman/quickstarts/echo-service/target/apiman-quickstarts-echo-service-1.1.8.Final.war apiman/`
+```sh
+docker cp apimansite_apiman_1:/opt/jboss/wildfly/apiman/quickstarts/echo-service/target/apiman-quickstarts-echo-service-1.1.8.Final.war apiman/
+```
 
 (change version number as needed).
 Finally edit apiman/Dockerfile to reflect the updated war file to deploy, and rebuild the Docker image:
 
-`docker-compose build apiman`
+```sh
+docker-compose build apiman
+```
 
 One you have a running container check the echo service is there:
 
