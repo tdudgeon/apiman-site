@@ -26,10 +26,11 @@ Much is still to be done, including
 - describe how to backup and restore
 
 # Instructions
-The process is divided into 3 stages:
+The process is divided into 4 stages:
 1. quickstart with mostly default settings to get a basic (insecure) system running
 2. example of how to set up a service with Apiman
-3. instructions for what needs to be changed to make the sytem suitabne for production
+3. instructions for what needs to be changed to make the sytem suitable for production
+4. handling backup and disaster recovery
 
 # Quickstart
 
@@ -38,8 +39,8 @@ Install Docker and Docker Compose [see here](https://docs.docker.com/compose/ins
 
 ## Edit configuration files
 
-Create a keystore.jks and server.crt file containing your keystore and server certificate. In production this would be your public certificate (signed by a root authority). In testing it would be a self-signed certificate. Selelf signed certificates for localhost and 192.168.59.103 are provided - copy these to keystore.jks and server.crt as needed.
-Then copy those files to teh needed places using the copy-keystore.sh shell script.
+Create a keystore.jks and server.crt file containing your keystore and server certificate. In production this would be your public certificate (signed by a root authority). In testing it would be a self-signed certificate. Self signed certificates for localhost and 192.168.59.103 are provided - copy these to keystore.jks and server.crt as needed.
+Then copy those files to the needed places using the copy-keystore.sh shell script.
 
 Also, if your server name is not 192.168.59.103 you need to edit these files: 
 apiman/apiman-ds.xml - edit the connection url to point to your server
@@ -98,3 +99,69 @@ https://192.168.59.103/apimanui/
 You should se the API Management console.
 
 So far so good. We have a functioning setup, so let's use it to set up a service.
+
+# Running Echo service through apiman
+## Setting up echo service
+We'll use the apiman echo service sample app to test things. For this we'll run the echo app to wildfly in the apiman container.
+The is done by default in the apiman Dockerfile, but if you need to use a different version you can build as follows:
+Start an apiman container.
+Install maven into the apimman contianer (as root):
+`docker exec -it -u root apimansite_apiman_1 bash -c 'curl -o /etc/yum.repos.d/epel-apache-maven.repo https://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo; yum install -y apache-maven'`
+Now build the echo-service war file:
+`docker exec -it apimansite_apiman_1 bash -c 'cd /opt/jboss/wildfly/apiman/quickstarts/echo-service; mvn clean package'`
+Now copy it from the container:
+`docker cp apimansite_apiman_1:/opt/jboss/wildfly/apiman/quickstarts/echo-service/target/apiman-quickstarts-echo-service-1.1.8.Final.war apiman/`
+(change version number as needed).
+Finally edit apiman/Dockerfile to reflect the updated war file to deploy, and rebuild the Docker image:
+`docker-compose build apiman`
+
+One you have a running container check the echo service is there:
+```$ curl http://192.168.59.103/apiman-echo/bla/bla
+{
+  "method" : "GET",
+  "resource" : "/apiman-echo/bla/bla",
+  "uri" : "/apiman-echo/bla/bla",
+  "headers" : {
+    "Host" : "192.168.59.103",
+    "User-Agent" : "curl/7.37.1",
+    "Accept" : "*/*"
+  },
+  "bodyLength" : null,
+  "bodySha1" : null
+```
+
+## Configuring apiman to use the echo service
+We'll take a bare bones approach here and set it up as a public service.
+1. Log in to apiman at https://192.168.59.103/apimanui using admin/admin123!
+2. Create an organisation
+3. Create a new service in that organisation, name it echoservice
+4. For the implementation choose http://localhost:8080/apiman-echo as a REST service with no API security. In this case the service is running within the same container so the host should be localhost and the port the port on which wildfly is actually running, not the port that Docker exposes. In a real world case you would point to a service running on a different server.
+5. In the Plans section check the "Make this service public" option.
+6. Publish the service.
+7. Find out what the endpoint is. Should be something like this: https://192.168.59.103/apiman-gateway/MyOrganisation/echoservice/1.0
+8. Test it works:
+```$ curl -k https://192.168.59.103/apiman-gateway/MyOrganisation/echoservice/1.0/hello
+{
+  "method" : "GET",
+  "resource" : "/apiman-echo/hello",
+  "uri" : "/apiman-echo/hello",
+  "headers" : {
+    "Host" : "localhost:8080",
+    "Accept-Encoding" : "gzip",
+    "User-Agent" : "curl/7.37.1",
+    "Accept" : "*/*",
+    "Connection" : "Keep-Alive"
+  },
+  "bodyLength" : null,
+  "bodySha1" : null
+}$````
+
+
+# Making the setup more secure
+So far we've mostly used default settings which means that passwords and certificates are those found in the github repository, so this setup is far from suitable for a prodcution system. In this section we address this, and other aspects relating to security.
+
+TODO - write this section.
+
+# Handling backups and disaster recovery
+ 
+TODO - write this section.

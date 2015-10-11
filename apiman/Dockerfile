@@ -8,14 +8,13 @@ RUN cd $JBOSS_HOME \
  && bsdtar -xf apiman-distro-wildfly8-$APIMAN_VERSION-overlay.zip \
  && rm apiman-distro-wildfly8-$APIMAN_VERSION-overlay.zip
 
+RUN /opt/jboss/wildfly/bin/add-user.sh admin admin --silent
+
 COPY postgresql-9.4-1203-jdbc41.jar /opt/jboss/wildfly/standalone/deployments/
 COPY apiman-ds.xml /opt/jboss/wildfly/standalone/deployments/
 COPY apiman.properties /opt/jboss/wildfly/standalone/configuration/
 COPY standalone-apiman.xml /opt/jboss/wildfly/standalone/configuration/
 COPY keystore.jks /opt/jboss/wildfly/standalone/configuration/
-
-RUN /opt/jboss/wildfly/bin/add-user.sh admin admin --silent
- 
-
+COPY apiman-quickstarts-echo-service-1.1.8.Final.war /opt/jboss/wildfly/standalone/deployments/
 
 CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0", "-c", "standalone-apiman.xml"]
