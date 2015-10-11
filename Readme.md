@@ -164,7 +164,7 @@ We'll take a bare bones approach here and set it up as a public service.
 7. Find out what the endpoint is. Should be something like this: https://192.168.59.103/apiman-gateway/MyOrganisation/echoservice/1.0
 8. Test it works:
 
-```$ curl -k https://192.168.59.103/apiman-gateway/MyOrganisation/echoservice/1.0/hello
+`$ curl -k https://192.168.59.103/apiman-gateway/MyOrganisation/echoservice/1.0/hello
 {
   "method" : "GET",
   "resource" : "/apiman-echo/hello",
@@ -178,7 +178,7 @@ We'll take a bare bones approach here and set it up as a public service.
   },
   "bodyLength" : null,
   "bodySha1" : null
-}$````
+}$`
 
 
 # Making the setup more secure
