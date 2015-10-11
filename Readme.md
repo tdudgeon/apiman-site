@@ -138,7 +138,7 @@ Finally edit apiman/Dockerfile to reflect the updated war file to deploy, and re
 
 One you have a running container check the echo service is there:
 
-```$ curl http://192.168.59.103/apiman-echo/bla/bla
+`$ curl http://192.168.59.103/apiman-echo/bla/bla
 {
   "method" : "GET",
   "resource" : "/apiman-echo/bla/bla",
@@ -150,7 +150,7 @@ One you have a running container check the echo service is there:
   },
   "bodyLength" : null,
   "bodySha1" : null
-```
+`
 
 ## Configuring apiman to use the echo service
 We'll take a bare bones approach here and set it up as a public service.
