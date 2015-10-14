@@ -17,4 +17,6 @@ COPY standalone-apiman.xml /opt/jboss/wildfly/standalone/configuration/
 COPY keystore.jks /opt/jboss/wildfly/standalone/configuration/
 COPY apiman-quickstarts-echo-service-1.1.8.Final.war /opt/jboss/wildfly/standalone/deployments/
 
+VOLUME /opt/jboss/wildfly/standalone/data
+
 CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0", "-c", "standalone-apiman.xml"]

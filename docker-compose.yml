@@ -3,6 +3,9 @@ postgres:
     ports:
     - "5432:5432"
 
+elasticsearch:
+    image: elasticsearch
+
 keycloak:
     build: keycloak/
     ports:
@@ -23,3 +26,4 @@ apiman:
     - 9990:9990
     links:
     - postgres:postgres
+    - elasticsearch:elasticsearch

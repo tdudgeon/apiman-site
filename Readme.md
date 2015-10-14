@@ -1,6 +1,8 @@
 # About
 This is a Docker project that illustrates how to set up a Dockerised environment for Apiman containing:
+
 - [PostgreSQL database](http://www.postgresql.org/)
+- [Elasticsearch](https://www.elastic.co/products/elasticsearch)
 - [Keycloak](http://keycloak.jboss.org/) authentication server
 - [Apiman](http://www.apiman.io/) for API management
 
@@ -18,12 +20,11 @@ Other aspects that we want to handle:
 # Status
 This work is at an initial stage. So far we have:
 
-- separate Docker containers for PostgreSQL, Keycloak and Apiman
+- separate Docker containers for PostgreSQL, Elasticsearch, Keycloak and Apiman
 - Keycloak and Apiman using PostgreSQL for persistence
 
 Much is still to be done, including
 
-- separate container for Elastic search
 - separate containers for Apimman manager and Apiman gateway
 - set up of SSL keys
 - describe how to make system secure
@@ -61,6 +62,8 @@ The main docker-compose.yml file is present in the top level directory. This use
 - /postgres
 - /keycloak
 - /apiman
+
+The standard elacticsearch docker image from Dockerhub is used for the Elasticsearch container.
 
 `docker-compose build`
 
@@ -101,6 +104,7 @@ Now start all the containers using `docker-compose up -d`.
 
 ```sh
 $ docker-compose up -d
+Creating apimansite_elasticsearch_1...
 Creating apimansite_apiman_1...
 Recreating apimansite_postgres_1...
 Creating apimansite_keycloak_1...
