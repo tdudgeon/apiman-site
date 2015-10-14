@@ -18,7 +18,10 @@ Other aspects that we want to handle:
 4. how to brand the setup so that it looks the way you want
 
 # Status
-This work is at an initial stage. So far we have:
+
+IMPORTANT: this is not currently suitable for production use.
+
+This work is incomplete. So far we have:
 
 - separate Docker containers for PostgreSQL, Elasticsearch, Keycloak and Apiman
 - Keycloak and Apiman using PostgreSQL for persistence
@@ -28,7 +31,7 @@ Much is still to be done, including
 - separate containers for Apimman manager and Apiman gateway
 - set up of SSL keys
 - describe how to make system secure
-- describe how to backup and restore
+- describe how to backup and restore 
 
 # Instructions
 The process is divided into 4 stages:
