@@ -15,7 +15,13 @@ COPY apiman-ds.xml /opt/jboss/wildfly/standalone/deployments/
 COPY apiman.properties /opt/jboss/wildfly/standalone/configuration/
 COPY standalone-apiman.xml /opt/jboss/wildfly/standalone/configuration/
 COPY keystore.jks /opt/jboss/wildfly/standalone/configuration/
-COPY apiman-quickstarts-echo-service-1.1.8.Final.war /opt/jboss/wildfly/standalone/deployments/
+
+# remove elasticsearch as we're using separate elasticsearch container
+RUN rm /opt/jboss/wildfly/standalone/deployments/apiman-es.war
+
+# optional - add the demo echo service. remove if you don't want this
+# see instructions if you need to build a different version
+COPY apiman-quickstarts-echo-service-$APIMAN_VERSION.war /opt/jboss/wildfly/standalone/deployments/
 
 VOLUME /opt/jboss/wildfly/standalone/data
 
