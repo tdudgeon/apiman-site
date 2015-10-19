@@ -75,7 +75,7 @@
             "enabled" : true,
             "baseUrl" : "/apimanui",
             "redirectUris" : [
-                "https://192.168.59.103/apimanui/*", "http://192.168.59.103/apimanui/*"
+                "https://192.168.59.103:9443/apimanui/*", "http://192.168.59.103:9080/apimanui/*"
             ],
             "secret" : "password"
         },

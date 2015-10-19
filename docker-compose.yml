@@ -17,12 +17,14 @@ keycloak:
     - POSTGRES_DATABASE=keycloak
     - POSTGRES_USER=keycloak
     - POSTGRES_PASSWORD=keycloak
+#    volumes:
+#    - "themes/banana:/opt/jboss/keycloak/standalone/configuration/themes/banana"
 
 apiman:
     build: apiman/
     ports:
-    - 80:8080
-    - 443:8443
+    - 9080:8080
+    - 9443:8443
     - 9990:9990
     links:
     - postgres:postgres

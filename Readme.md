@@ -15,7 +15,6 @@ Other aspects that we want to handle:
 1. provision of SSL keys (self signed for testing, real ones for production)
 2. how to generate integral backups of the entire system
 3. defining and documenting how to lock down security in a manner suitable for a production system
-4. how to brand the setup so that it looks the way you want
 
 # Status
 
@@ -48,8 +47,8 @@ Install Docker and Docker Compose [see here](https://docs.docker.com/compose/ins
 
 ## Edit configuration files
 
-Create a keystore.jks and server.crt file containing your keystore and server certificate. In production this would be your public certificate (signed by a root authority). In testing it would be a self-signed certificate. Self signed certificates for localhost and 192.168.59.103 are provided - copy these to keystore.jks and server.crt as needed.
-Then copy those files to the needed places using the copy-keystore.sh shell script.
+Create a keystore.jks containing your keystore. In production this would be your public certificate (signed by a root authority). In testing it would be a self-signed certificate. Self signed certificates for localhost and 192.168.59.103 are provided - copy one of these to keystore.jks or create your own as needed.
+Then copy the keystore to the needed places using the copy-keystore.sh shell script.
 
 Also, if your server name is not 192.168.59.103 you need to edit these files:
 
@@ -79,7 +78,7 @@ NOTE: docker-compose by default uses the parent directory name as the root stem 
 This deploys a Docker container with the PostgreSQL database.
 
 ```sh
-$ docker-compose up -d postgres
+$ docker-compose up -d postgres elasticsearch
 Creating apimansite_postgres_1...
 $ docker ps
 CONTAINER ID        IMAGE                 COMMAND                CREATED             STATUS              PORTS                    NAMES
@@ -204,6 +203,72 @@ $ curl -k https://192.168.59.103/apiman-gateway/MyOrganisation/echoservice/1.0/h
   "bodyLength" : null,
   "bodySha1" : null
 }$
+```
+
+# Branding
+You'll probably want to change the branding so that at the very least it contains your logos, or maybe to completely change the L&F.
+A full description is out of scope, but here's a brief guide to making some simple changes to basic things like icons. For this we take the approach of copying the keyloak theme and making a few changes to it.
+
+For full instructions on keycloak themes see [here](http://keycloak.github.io/docs/userguide/html/themes.html).
+
+## Copying the keycloak theme
+Create a themes directory and copy the existing keycloak theme configuration to it and give it the name banana (choose your own name!).
+
+```sh
+mkdir themes
+docker cp apimansite_keycloak_1:/opt/jboss/keycloak/standalone/configuration/themes/keycloak themes/banana
+```
+
+Edit the content as required (for basic stuff you probably just want to change the icons and css). the very minimum you may want to change is:
+
+- login/resources/img/keycloak-logo.png
+- account/resources/img/keycloak-logo.png
+- admin/resources/img/keyclok-logo.svg (note the typo)
+- welcome/resources/keycloak_logo.png
+
+But you might well also need to look at the css and other content.
+
+Then mount that dir into your keycloak image as volume. First change docker-compose.yml so that the keycloak container mounts the directory as a volume.
+Add this to your keycloak cotnainer definition:
+
+```
+    volumes:
+    - "themes/banana:/opt/jboss/keycloak/standalone/configuration/themes/banana"
+```
+
+## Optional: create a customised keycloak-server.json 
+
+This file lets you defined your theme as the default theme and to change the caching properties which can be useful as it allows you to make changes and see the impact directly.
+
+You might want to edit keycloak/keycloak-server.json. This is present in the github repo, but if you need to update it to a newer version you can do so like this:
+
+```sh
+docker cp apimansite_keycloak_1:/opt/jboss/keycloak/standalone/configuration/keycloak-server.json keycloak/
+```
+
+Then modify the theme section to look like this (according to your needs):
+
+```
+    "theme": {
+        "default": "banana",
+        "staticMaxAge": -1,
+        "cacheTemplates": false,
+        "cacheThemes": false,
+        "folder": {
+          "dir": "${jboss.server.config.dir}/themes"
+        }
+    },
+```
+
+The standard keycloak Dockerfile copies this file to the container. If you don't edit this file you will need to set the themes manually using the keycloak UI.
+
+Then restart the keycloak container:
+
+```sh
+docker-compose stop keycloak
+docker-compose rm -f keycloak
+docker-compose build keycloak
+docker-compose up -d --no-recreate keycloak
 ```
 
 
