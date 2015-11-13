@@ -1,7 +1,7 @@
 FROM jboss/wildfly:8.2.0.Final
 MAINTAINER Tim Dudgeon <tdudgeon@informaticsmatters.com>
 
-ENV APIMAN_VERSION 1.1.8.Final
+ENV APIMAN_VERSION 1.1.9.Final
 
 RUN cd $JBOSS_HOME \
  && curl http://downloads.jboss.org/overlord/apiman/$APIMAN_VERSION/apiman-distro-wildfly8-$APIMAN_VERSION-overlay.zip -o apiman-distro-wildfly8-$APIMAN_VERSION-overlay.zip \
@@ -11,10 +11,6 @@ RUN cd $JBOSS_HOME \
 RUN /opt/jboss/wildfly/bin/add-user.sh admin admin --silent
 
 COPY postgresql-9.4-1203-jdbc41.jar /opt/jboss/wildfly/standalone/deployments/
-COPY apiman-ds.xml /opt/jboss/wildfly/standalone/deployments/
-COPY apiman.properties /opt/jboss/wildfly/standalone/configuration/
-COPY standalone-apiman.xml /opt/jboss/wildfly/standalone/configuration/
-COPY keystore.jks /opt/jboss/wildfly/standalone/configuration/
 
 # remove elasticsearch as we're using separate elasticsearch container
 RUN rm /opt/jboss/wildfly/standalone/deployments/apiman-es.war

@@ -48,7 +48,6 @@ Install Docker and Docker Compose [see here](https://docs.docker.com/compose/ins
 ## Edit configuration files
 
 Create a keystore.jks containing your keystore. In production this would be your public certificate (signed by a root authority). In testing it would be a self-signed certificate. Self signed certificates for localhost and 192.168.59.103 are provided - copy one of these to keystore.jks or create your own as needed.
-Then copy the keystore to the needed places using the copy-keystore.sh shell script.
 
 Also, if your server name is not 192.168.59.103 you need to edit these files:
 
@@ -73,17 +72,18 @@ This uses the docker-compose.yml file in the top directory to build the differen
 NOTE: docker-compose by default uses the parent directory name as the root stem for the images/container names. If your root directory name is not apiman-site then some of the commands that follow will need adjusting, or you can use the -p argument for docker-compose to set the name to something different from the directory name.
  
 ## Deploy database
-`docker-compose up -d postgres`
+`docker-compose up -d postgres elasticsearch`
 
 This deploys a Docker container with the PostgreSQL database.
 
 ```sh
 $ docker-compose up -d postgres elasticsearch
-Creating apimansite_postgres_1...
+Starting apimansite_elasticsearch_1...
+Starting apimansite_postgres_1...
 $ docker ps
-CONTAINER ID        IMAGE                 COMMAND                CREATED             STATUS              PORTS                    NAMES
-d7a44e51beba        apimansite_postgres   "/usr/lib/postgresql   52 seconds ago      Up 51 seconds       0.0.0.0:5432->5432/tcp   apimansite_postgres_1   
-$
+CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                    NAMES
+1cd1cfa14019        elasticsearch         "/docker-entrypoint.s"   57 seconds ago      Up 18 seconds       9200/tcp, 9300/tcp       apimansite_elasticsearch_1
+503c46e75738        apimansite_postgres   "/usr/lib/postgresql/"   3 minutes ago       Up 18 seconds       0.0.0.0:5432->5432/tcp   apimansite_postgres_1
 ```
 
 ## Import apiman realm into Keycloak
@@ -121,7 +121,7 @@ https://192.168.59.103:8443/auth/admin/
 You should see the apiman realm that was imported.
 Now check you the apiman manger using admin/admin123! as credentials:
 
-https://192.168.59.103/apimanui/
+https://192.168.59.103:9443/apimanui/
 
 You should se the API Management console.
 
@@ -216,7 +216,8 @@ Create a themes directory and copy the existing keycloak theme configuration to 
 
 ```sh
 mkdir themes
-docker cp apimansite_keycloak_1:/opt/jboss/keycloak/standalone/configuration/themes/keycloak themes/banana
+docker cp apimansite_keycloak_1:/opt/jboss/keycloak/standalone/configuration/themes/keycloak themes/
+mv themes/keycloak themesthemes/banana
 ```
 
 Edit the content as required (for basic stuff you probably just want to change the icons and css). the very minimum you may want to change is:
@@ -238,7 +239,7 @@ Add this to your keycloak cotnainer definition:
 
 ## Optional: create a customised keycloak-server.json 
 
-This file lets you defined your theme as the default theme and to change the caching properties which can be useful as it allows you to make changes and see the impact directly.
+This file lets you define your theme as the default theme and to change the caching properties which can be useful as it allows you to make changes and see the impact directly.
 
 You might want to edit keycloak/keycloak-server.json. This is present in the github repo, but if you need to update it to a newer version you can do so like this:
 

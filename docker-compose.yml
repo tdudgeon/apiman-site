@@ -17,8 +17,11 @@ keycloak:
     - POSTGRES_DATABASE=keycloak
     - POSTGRES_USER=keycloak
     - POSTGRES_PASSWORD=keycloak
-#    volumes:
-#    - "themes/banana:/opt/jboss/keycloak/standalone/configuration/themes/banana"
+    volumes:
+    - "./keycloak/standalone-ssl.xml:/opt/jboss/keycloak/standalone/configuration/standalone.xml"
+    - "./keystore.jks:/opt/jboss/keycloak/standalone/configuration/keystore.jks"
+    - "./themes/banana:/opt/jboss/keycloak/standalone/configuration/themes/banana"
+#    - "./keycloak/keycloak-server.json:/opt/jboss/keycloak/standalone/configuration/keycloak-server.json"
 
 apiman:
     build: apiman/
@@ -29,3 +32,8 @@ apiman:
     links:
     - postgres:postgres
     - elasticsearch:elasticsearch
+    volumes:
+    - "./apiman/apiman-ds.xml:/opt/jboss/wildfly/standalone/deployments/apiman-ds.xml"
+    - "./apiman/apiman.properties:/opt/jboss/wildfly/standalone/configuration/apiman.properties"
+    - "./apiman/standalone-apiman.xml:/opt/jboss/wildfly/standalone/configuration/standalone-apiman.xml"
+    - "./keystore.jks:/opt/jboss/wildfly/standalone/configuration/keystore.jks"
